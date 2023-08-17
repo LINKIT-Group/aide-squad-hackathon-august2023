@@ -1,0 +1,12 @@
+[package]
+name = "asteroids"
+version = "0.1.0"
+edition = "2021"
+
+
+[dependencies]
+wasm-bindgen = "0.2"
+macroquad = "0.4.2"
+macroquad-platformer = "0.2"
+macroquad-tiled = "0.2"
+cgmath = "0.17"

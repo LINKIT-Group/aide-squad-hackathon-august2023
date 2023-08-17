@@ -1,0 +1,13 @@
+export CHARSET=UTF-8
+export LANG=C.UTF-8
+export PS1='\h:\w\$ '
+umask 022
+
+[ -f /.aliases ] && . /.aliases
+
+for script in /etc/profile.d/*.sh;do
+    [ -r $script ] && . $script
+done
+
+# export custom variables
+[ -s .env ] && export $(cat .env)

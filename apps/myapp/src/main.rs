@@ -1,7 +1,7 @@
 use macroquad::prelude::*;
 
-const SCREEN_WIDTH: f32 = 800.0;
-const SCREEN_HEIGHT: f32 = 600.0;
+const SCREEN_WIDTH: f32 = 1280.0;
+const SCREEN_HEIGHT: f32 = 800.0;
 const GRAVITY: f32 = 0.25;
 const JUMP_STRENGTH: f32 = -5.0;
 const PIPE_SPEED: f32 = -3.0;
@@ -27,43 +27,104 @@ impl Pipe {
     }
 }
 
+
+enum GameMode {
+    Playing,
+    GameOver,
+}
+
+
+struct GameState {
+    bird: Bird,
+    pipes: Vec<Pipe>,
+}
+
+impl GameState {
+    fn new() -> Self {
+        let bird = Bird {
+            position: vec2(SCREEN_WIDTH * 0.2, SCREEN_HEIGHT / 2.0),
+            velocity: 0.0,
+        };
+        let pipes = vec![Pipe::new(SCREEN_WIDTH)];
+        GameState { bird, pipes }
+    }
+
+    // fn restart(&mut self) {
+    //     *self = GameState::new();
+    // }
+}
+
+// ... [Bird and Pipe structures as before] ...
+
 #[macroquad::main("Flappy Bird")]
 async fn main() {
-    let mut bird = Bird {
-        position: vec2(SCREEN_WIDTH * 0.2, SCREEN_HEIGHT / 2.0),
-        velocity: 0.0,
-    };
+    let mut game_state = GameState::new();
+    let mut mode = GameMode::Playing;
 
-    let mut pipes: Vec<Pipe> = Vec::new();
 
     loop {
-        // Bird physics
-        bird.velocity += GRAVITY;
-        bird.position.y += bird.velocity;
+        match mode {
+            GameMode::Playing => {
+                // Bird physics
+                game_state.bird.velocity += GRAVITY;
+                game_state.bird.position.y += game_state.bird.velocity;
 
-        if is_mouse_button_pressed(MouseButton::Left) {
-            bird.velocity = JUMP_STRENGTH;
+                if is_mouse_button_pressed(MouseButton::Left) {
+                    game_state.bird.velocity = JUMP_STRENGTH;
+                }
+
+                // Pipe logic
+                for pipe in &mut game_state.pipes {
+                    pipe.position.x += PIPE_SPEED;
+                }
+
+                if game_state.pipes[0].position.x + 60.0 < 0.0 {
+                    game_state.pipes.remove(0);
+                    game_state.pipes.push(Pipe::new(SCREEN_WIDTH));
+                }
+
+                // Collision with ground or ceiling
+                if game_state.bird.position.y <= 0.0 || game_state.bird.position.y >= SCREEN_HEIGHT {
+                    mode = GameMode::GameOver;
+                }
+
+                // Collision with pipes
+                for pipe in &game_state.pipes {
+                    if game_state.bird.position.y < pipe.gap_y - 50.0 || game_state.bird.position.y > pipe.gap_y + 50.0 {
+                        if game_state.bird.position.x > pipe.position.x && game_state.bird.position.x < pipe.position.x + 60.0 {
+                            mode = GameMode::GameOver;
+                            break; // no need to check further pipes if we're restarting
+                        }
+                    }
+                }
+                 // ... [drawing code] ...
+
+
+                clear_background(SKYBLUE);
+
+                // Draw bird
+                draw_circle(game_state.bird.position.x, game_state.bird.position.y, 20.0, YELLOW);
+
+                // Draw pipes
+                for pipe in &game_state.pipes {
+                    draw_rectangle(pipe.position.x, 0.0, 60.0, pipe.gap_y - 50.0, DARKGREEN);
+                    draw_rectangle(pipe.position.x, pipe.gap_y + 50.0, 60.0, SCREEN_HEIGHT - pipe.gap_y - 50.0, DARKGREEN);
+                }
+            }
+
+            GameMode::GameOver => {
+                clear_background(SKYBLUE);
+                
+                draw_text("Game Over", SCREEN_WIDTH / 2.0 - 100.0, SCREEN_HEIGHT / 2.0 - 20.0, 40.0, WHITE);
+                draw_text("Click to restart!", SCREEN_WIDTH / 2.0 - 150.0, SCREEN_HEIGHT / 2.0 + 30.0, 30.0, WHITE);
+
+                if is_mouse_button_pressed(MouseButton::Left) {
+                    game_state = GameState::new();
+                    mode = GameMode::Playing;
+                }
+            }
         }
-
-        // Pipe logic
-        if pipes.is_empty() || pipes.last().unwrap().position.x < SCREEN_WIDTH - PIPE_SPACING {
-            pipes.push(Pipe::new(SCREEN_WIDTH));
-        }
-
-        for pipe in &mut pipes {
-            pipe.position.x += PIPE_SPEED;
-        }
-
-        pipes.retain(|pipe| pipe.position.x > -60.0); // Remove pipes that are off-screen
-
-        // Collision logic...
-
-        clear_background(SKYBLUE);
-
-        // Draw bird...
-
-        // Draw pipes...
-        
+       
         next_frame().await;
     }
 }

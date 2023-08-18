@@ -4,7 +4,7 @@ const SCREEN_WIDTH: f32 = 1700.0;
 const SCREEN_HEIGHT: f32 = 900.0;
 const GRAVITY: f32 = 0.25;
 const JUMP_STRENGTH: f32 = -5.0;
-const PIPE_SPEED: f32 = -3.0;
+const PIPE_SPEED: f32 = -4.0;
 const PIPE_SPACING: f32 = 550.0;
 const FRAME_THICKNESS: f32 = 5.0;
 const COIN_SPAWN_RATE: f32 = 0.02;  // for instance, 2% chance every frame
@@ -90,9 +90,9 @@ fn is_circle_colliding_with_rect(circle_pos: Vec2, circle_radius: f32, rect_pos:
 }
 
 
-fn update_pipes(pipes: &mut Vec<Pipe>) {
+fn update_pipes(pipes: &mut Vec<Pipe>, speed_update: f32) {
     for pipe in pipes.iter_mut() {
-        pipe.position.x += PIPE_SPEED;
+        pipe.position.x += PIPE_SPEED * speed_update;
     }
 
     pipes.retain(|pipe| pipe.position.x + pipe.size.x > 0.0);
@@ -216,11 +216,11 @@ async fn main() {
                 //     pipe.position.x += PIPE_SPEED;
                 // }
 
-                update_pipes(&mut game_state.pipes);
+                update_pipes(&mut game_state.pipes, game_state.speed_multiplier);
 
 
                 for coin in &mut game_state.coins {
-                    coin.position.x += PIPE_SPEED;
+                    coin.position.x += PIPE_SPEED * game_state.speed_multiplier;
                 }
 
                 game_state.pipes.retain(|pipe| pipe.position.x > -60.0);
@@ -250,7 +250,7 @@ async fn main() {
                     let collided = is_circle_colliding_with_bird(&game_state.bird, coin.position, coin.radius);
                     if collided {
                         game_state.score += 1;  // Assuming you have a score field in GameState
-                        game_state.speed_multiplier = 1.0 + 0.1 * game_state.score as f32;
+                        game_state.speed_multiplier = 1.0 + 0.2 * game_state.score as f32;
                     }
                     !collided && coin.position.x + coin.radius > 0.0
                 });

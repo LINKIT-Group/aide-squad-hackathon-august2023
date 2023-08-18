@@ -1,16 +1,47 @@
 use macroquad::prelude::*;
 
-const SCREEN_WIDTH: f32 = 1280.0;
-const SCREEN_HEIGHT: f32 = 800.0;
+const SCREEN_WIDTH: f32 = 1800.0;
+const SCREEN_HEIGHT: f32 = 900.0;
 const GRAVITY: f32 = 0.25;
 const JUMP_STRENGTH: f32 = -5.0;
 const PIPE_SPEED: f32 = -3.0;
 const PIPE_SPACING: f32 = 300.0;
+const FRAME_THICKNESS: f32 = 5.0;
+
+fn draw_game_frame() {
+    // Top line
+    draw_line(0.0, 0.0, SCREEN_WIDTH, 0.0, FRAME_THICKNESS, BLACK);
+    
+    // Bottom line
+    draw_line(0.0, SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT, FRAME_THICKNESS, BLACK);
+    
+    // Left line
+    draw_line(0.0, 0.0, 0.0, SCREEN_HEIGHT, FRAME_THICKNESS, BLACK);
+    
+    // Right line
+    draw_line(SCREEN_WIDTH, 0.0, SCREEN_WIDTH, SCREEN_HEIGHT, FRAME_THICKNESS, BLACK);
+}
+
 
 struct Bird {
     position: Vec2,
     velocity: f32,
+    // texture: Texture2D, // This is the new field for the image texture
 }
+
+// impl Bird {
+//     fn new() -> Self {
+//         // let texture = load_texture("assets/pocket.png").unwrap(); // Load the texture
+//         let texture = futures::executor::block_on(async {
+//             load_texture("assets/rocker.png").await.unwrap()
+//         });
+//         Self {
+//             position: Vec2::new(SCREEN_WIDTH / 4.0, SCREEN_HEIGHT / 2.0),
+//             velocity: 0.0,
+//             texture, // Set the loaded texture
+//         }
+//     }
+// }
 
 struct Pipe {
     position: Vec2,
@@ -41,6 +72,7 @@ struct GameState {
 
 impl GameState {
     fn new() -> Self {
+        // let bird = Bird::new();
         let bird = Bird {
             position: vec2(SCREEN_WIDTH * 0.2, SCREEN_HEIGHT / 2.0),
             velocity: 0.0,
@@ -60,6 +92,8 @@ impl GameState {
 async fn main() {
     let mut game_state = GameState::new();
     let mut mode = GameMode::Playing;
+    let player_texture = load_texture("assets/my_image.png").await.unwrap();
+
 
 
     loop {
@@ -101,9 +135,13 @@ async fn main() {
 
 
                 clear_background(SKYBLUE);
+                draw_game_frame();
+
 
                 // Draw bird
                 draw_circle(game_state.bird.position.x, game_state.bird.position.y, 20.0, YELLOW);
+                // draw_texture(&player_texture, game_state.bird.position.x, game_state.bird.position.y, YELLOW);
+
 
                 // Draw pipes
                 for pipe in &game_state.pipes {
@@ -114,6 +152,8 @@ async fn main() {
 
             GameMode::GameOver => {
                 clear_background(SKYBLUE);
+                draw_game_frame();
+
                 
                 draw_text("Game Over", SCREEN_WIDTH / 2.0 - 100.0, SCREEN_HEIGHT / 2.0 - 20.0, 40.0, WHITE);
                 draw_text("Click to restart!", SCREEN_WIDTH / 2.0 - 150.0, SCREEN_HEIGHT / 2.0 + 30.0, 30.0, WHITE);

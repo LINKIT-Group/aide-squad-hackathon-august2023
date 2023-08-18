@@ -182,7 +182,7 @@ async fn main() {
                 game_state.bird.velocity += GRAVITY;
                 game_state.bird.position.y += game_state.bird.velocity;
 
-                if is_mouse_button_pressed(MouseButton::Left) {
+                if is_key_pressed(KeyCode::Space) {
                     game_state.bird.velocity = JUMP_STRENGTH;
                 }
 
@@ -307,7 +307,7 @@ async fn main() {
                 draw_text("Click to restart!", SCREEN_WIDTH / 2.0 - 150.0, SCREEN_HEIGHT / 2.0 + 30.0, 30.0, Color::new(42.0 / 255.0, 37.0 / 255.0, 56.0 / 255.0, 1.0));
             
 
-                if is_mouse_button_pressed(MouseButton::Left) {
+                if is_key_pressed(KeyCode::Space) {
                     game_state = GameState::new();
                     mode = GameMode::Playing;
                 }

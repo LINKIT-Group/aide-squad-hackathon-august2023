@@ -27,57 +27,85 @@ impl Pipe {
     }
 }
 
+
+struct GameState {
+    bird: Bird,
+    pipes: Vec<Pipe>,
+}
+
+impl GameState {
+    fn new() -> Self {
+        let bird = Bird {
+            position: vec2(SCREEN_WIDTH * 0.2, SCREEN_HEIGHT / 2.0),
+            velocity: 0.0,
+        };
+        let pipes = vec![Pipe::new(SCREEN_WIDTH)];
+        GameState { bird, pipes }
+    }
+
+    fn restart(&mut self) {
+        *self = GameState::new();
+    }
+}
+
+// ... [Bird and Pipe structures as before] ...
+
 #[macroquad::main("Flappy Bird")]
 async fn main() {
-    let mut bird = Bird {
-        position: vec2(SCREEN_WIDTH * 0.2, SCREEN_HEIGHT / 2.0),
-        velocity: 0.0,
-    };
+    let mut game_state = GameState::new();
+    let mut restart_game = false;
 
-    let mut pipes = vec![Pipe::new(SCREEN_WIDTH)];
 
     loop {
         // Bird physics
-        bird.velocity += GRAVITY;
-        bird.position.y += bird.velocity;
+        game_state.bird.velocity += GRAVITY;
+        game_state.bird.position.y += game_state.bird.velocity;
 
         if is_mouse_button_pressed(MouseButton::Left) {
-            bird.velocity = JUMP_STRENGTH;
+            game_state.bird.velocity = JUMP_STRENGTH;
         }
 
         // Pipe logic
-        for pipe in &mut pipes {
+        for pipe in &mut game_state.pipes {
             pipe.position.x += PIPE_SPEED;
         }
 
-        if pipes[0].position.x + 60.0 < 0.0 {
-            pipes.remove(0);
-            pipes.push(Pipe::new(SCREEN_WIDTH));
+        if game_state.pipes[0].position.x + 60.0 < 0.0 {
+            game_state.pipes.remove(0);
+            game_state.pipes.push(Pipe::new(SCREEN_WIDTH));
         }
 
         // Collision with ground or ceiling
-        if bird.position.y <= 0.0 || bird.position.y >= SCREEN_HEIGHT {
-            bird.position.y = SCREEN_HEIGHT / 2.0;
-            bird.velocity = 0.0;
+        if game_state.bird.position.y <= 0.0 || game_state.bird.position.y >= SCREEN_HEIGHT {
+            restart_game = true;
         }
 
         // Collision with pipes
-        for pipe in &pipes {
-            if bird.position.y < pipe.gap_y - 50.0 || bird.position.y > pipe.gap_y + 50.0 {
-                if bird.position.x > pipe.position.x && bird.position.x < pipe.position.x + 60.0 {
-                    bird.position.y = SCREEN_HEIGHT / 2.0;
-                    bird.velocity = 0.0;
+        for pipe in &game_state.pipes {
+            if game_state.bird.position.y < pipe.gap_y - 50.0 || game_state.bird.position.y > pipe.gap_y + 50.0 {
+                if game_state.bird.position.x > pipe.position.x && game_state.bird.position.x < pipe.position.x + 60.0 {
+                    restart_game = true;
+                    break; // no need to check further pipes if we're restarting
                 }
             }
         }
 
+        if restart_game {
+            game_state.restart();
+            restart_game = false;
+            continue; // skip drawing and go to the next loop iteration
+        }
+
+        // ... [drawing code] ...
+
+
         clear_background(SKYBLUE);
 
         // Draw bird
-        draw_circle(bird.position.x, bird.position.y, 20.0, YELLOW);
+        draw_circle(game_state.bird.position.x, game_state.bird.position.y, 20.0, YELLOW);
 
         // Draw pipes
-        for pipe in &pipes {
+        for pipe in &game_state.pipes {
             draw_rectangle(pipe.position.x, 0.0, 60.0, pipe.gap_y - 50.0, DARKGREEN);
             draw_rectangle(pipe.position.x, pipe.gap_y + 50.0, 60.0, SCREEN_HEIGHT - pipe.gap_y - 50.0, DARKGREEN);
         }

@@ -1,6 +1,6 @@
 use macroquad::prelude::*;
 
-const SCREEN_WIDTH: f32 = 1800.0;
+const SCREEN_WIDTH: f32 = 1700.0;
 const SCREEN_HEIGHT: f32 = 900.0;
 const GRAVITY: f32 = 0.25;
 const JUMP_STRENGTH: f32 = -5.0;
@@ -92,7 +92,7 @@ fn is_circle_colliding_with_rect(circle_pos: Vec2, circle_radius: f32, rect_pos:
 
 fn update_pipes(pipes: &mut Vec<Pipe>) {
     for pipe in pipes.iter_mut() {
-        pipe.position.x -= PIPE_SPEED;
+        pipe.position.x += PIPE_SPEED;
     }
 
     pipes.retain(|pipe| pipe.position.x + pipe.size.x > 0.0);

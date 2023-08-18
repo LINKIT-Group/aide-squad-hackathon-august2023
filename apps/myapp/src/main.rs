@@ -58,6 +58,7 @@ impl GameState {
 
 #[macroquad::main("Flappy Bird")]
 async fn main() {
+    let background_texture = load_texture("background.png").await.unwrap();
     let mut game_state = GameState::new();
     let mut mode = GameMode::Playing;
 
@@ -109,7 +110,16 @@ async fn main() {
                  // ... [drawing code] ...
 
 
-                clear_background(SKYBLUE);
+                draw_texture_ex(
+                    &background_texture,
+                    0.0,
+                    0.0,
+                    WHITE,
+                    DrawTextureParams {
+                        dest_size: Some(vec2(SCREEN_WIDTH, SCREEN_HEIGHT)),
+                        ..Default::default()
+                    },
+                );
 
                 // Draw bird
                 draw_circle(game_state.bird.position.x, game_state.bird.position.y, 20.0, YELLOW);

@@ -7,6 +7,7 @@ const JUMP_STRENGTH: f32 = -5.0;
 const PIPE_SPEED: f32 = -3.0;
 const PIPE_SPACING: f32 = 550.0;
 const FRAME_THICKNESS: f32 = 5.0;
+const COIN_SPAWN_RATE: f32 = 0.02;  // for instance, 2% chance every frame
 
 fn draw_game_frame() {
     // Top line
@@ -22,10 +23,19 @@ fn draw_game_frame() {
     draw_line(SCREEN_WIDTH, 0.0, SCREEN_WIDTH, SCREEN_HEIGHT, FRAME_THICKNESS, BLACK);
 }
 
+fn is_circle_colliding_with_bird(bird: &Bird, circle_pos: Vec2, circle_radius: f32) -> bool {
+    bird.position.distance(circle_pos) < bird.radius + circle_radius
+}
+
+struct Coin {
+    position: Vec2,
+    radius: f32,
+}
 
 struct Bird {
     position: Vec2,
     velocity: f32,
+    radius: f32,
     // texture: Texture2D, // This is the new field for the image texture
 }
 
@@ -50,10 +60,12 @@ enum GameMode {
     GameOver,
 }
 
-
 struct GameState {
     bird: Bird,
     pipes: Vec<Pipe>,
+    coins: Vec<Coin>,
+    score: i32,   // tracks the score, incremented when a coin is collected
+
 }
 
 impl GameState {
@@ -62,9 +74,20 @@ impl GameState {
         let bird = Bird {
             position: vec2(SCREEN_WIDTH * 0.2, SCREEN_HEIGHT / 2.0),
             velocity: 0.0,
+            radius: 20.0,
+
         };
         let pipes = vec![Pipe::new(SCREEN_WIDTH)];
-        GameState { bird, pipes }
+        let coins = Vec::new();
+        // GameState { bird, pipes, coins }
+        Self {
+            bird: bird,
+            pipes: pipes,
+            coins: coins,
+            score: 0,
+            // game_over: false,
+            // show_new_game_screen: true,
+        }
     }
 
     // fn restart(&mut self) {
@@ -106,8 +129,20 @@ async fn main() {
                     }
                 }
 
+                // periodically add coins:
+                if rand::gen_range(0.0, 1.0) < COIN_SPAWN_RATE {
+                    game_state.coins.push(Coin {
+                        position: Vec2::new(SCREEN_WIDTH, rand::gen_range(100.0, SCREEN_HEIGHT - 100.0)),
+                        radius: 15.0,
+                    });
+                }
+
                 for pipe in &mut game_state.pipes {
                     pipe.position.x += PIPE_SPEED;
+                }
+
+                for coin in &mut game_state.coins {
+                    coin.position.x += PIPE_SPEED;
                 }
 
                 game_state.pipes.retain(|pipe| pipe.position.x > -60.0);
@@ -126,6 +161,16 @@ async fn main() {
                         }
                     }
                 }
+
+
+                // collision with coins
+                game_state.coins.retain(|coin| {
+                    let collided = is_circle_colliding_with_bird(&game_state.bird, coin.position, coin.radius);
+                    if collided {
+                        game_state.score += 1;  // Assuming you have a score field in GameState
+                    }
+                    !collided && coin.position.x + coin.radius > 0.0
+                });
                  // ... [drawing code] ...
 
 
@@ -141,7 +186,11 @@ async fn main() {
                         ..Default::default()  // use default values for other parameters
                     },);
 
-
+                
+                // Draw Coins
+                for coin in &game_state.coins {
+                    draw_circle(coin.position.x, coin.position.y, coin.radius, GOLD);
+                }
                 // Draw pipes
                 for pipe in &game_state.pipes {
                     draw_rectangle(pipe.position.x, 0.0, 60.0, pipe.gap_y - 90.0, DARKGREEN);

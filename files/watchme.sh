@@ -9,7 +9,7 @@ PORT=8080
 
 if [ "$1" = "serve" ];then
     cd "${HTML_DIRECTORY}" || exit 1
-    cp "${APP_DIRECTORY}"/public/* . || exit 1
+    cp -r "${APP_DIRECTORY}"/public/* . || exit 1
     basic-http-server -a 0.0.0.0:${PORT} .
 elif [ "$1" = "update" ];then
     HASH=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1)

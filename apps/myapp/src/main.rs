@@ -283,7 +283,9 @@ async fn main() {
                 }
                 // Draw pipes
                 for pipe in &game_state.pipes {
-                    draw_rectangle(pipe.position.x, pipe.position.y, pipe.size.x, pipe.size.y, GREEN);
+                    let color = Color::from_rgba(42, 37, 56, 255);
+
+                    draw_rectangle(pipe.position.x, pipe.position.y, pipe.size.x, pipe.size.y, color);
 
                     // draw_rectangle(pipe.position.x, 0.0, 60.0, pipe.gap_y - 90.0, DARKGREEN);
                     // draw_rectangle(pipe.position.x, pipe.gap_y + 90.0, 60.0, SCREEN_HEIGHT - pipe.gap_y - 90.0, DARKGREEN);

@@ -1,7 +1,7 @@
 use macroquad::prelude::*;
 
-const SCREEN_WIDTH: f32 = 800.0;
-const SCREEN_HEIGHT: f32 = 600.0;
+const SCREEN_WIDTH: f32 = 1280.0;
+const SCREEN_HEIGHT: f32 = 800.0;
 const GRAVITY: f32 = 0.25;
 const JUMP_STRENGTH: f32 = -5.0;
 const PIPE_SPEED: f32 = -3.0;
@@ -49,9 +49,9 @@ impl GameState {
         GameState { bird, pipes }
     }
 
-    fn restart(&mut self) {
-        *self = GameState::new();
-    }
+    // fn restart(&mut self) {
+    //     *self = GameState::new();
+    // }
 }
 
 // ... [Bird and Pipe structures as before] ...
@@ -59,7 +59,6 @@ impl GameState {
 #[macroquad::main("Flappy Bird")]
 async fn main() {
     let mut game_state = GameState::new();
-    let mut restart_game = false;
     let mut mode = GameMode::Playing;
 
 

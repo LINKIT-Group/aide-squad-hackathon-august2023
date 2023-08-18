@@ -1,0 +1,16 @@
+[package]
+name = "flappy_bevy"
+version = "0.1.0"
+authors = ["TanTanDev"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+#bevy = "0.1.2"
+bevy = {git = "https://github.com/bevyengine/bevy.git", rev = "25f62f72"}
+rand = "0.7.3"
+getrandom = { version = "0.2", features = ["js"] }
+
+# Override breaking change, transitive via bevy_asset, which auto-resolves to 5.0.0-pre.13
+notify = "=5.0.0-pre.2"

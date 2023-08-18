@@ -34,7 +34,7 @@ async fn main() {
         velocity: 0.0,
     };
 
-    let mut pipes = vec![Pipe::new(SCREEN_WIDTH)];
+    let mut pipes: Vec<Pipe> = Vec::new();
 
     loop {
         // Bird physics
@@ -46,42 +46,24 @@ async fn main() {
         }
 
         // Pipe logic
+        if pipes.is_empty() || pipes.last().unwrap().position.x < SCREEN_WIDTH - PIPE_SPACING {
+            pipes.push(Pipe::new(SCREEN_WIDTH));
+        }
+
         for pipe in &mut pipes {
             pipe.position.x += PIPE_SPEED;
         }
 
-        if pipes[0].position.x + 60.0 < 0.0 {
-            pipes.remove(0);
-            pipes.push(Pipe::new(SCREEN_WIDTH));
-        }
+        pipes.retain(|pipe| pipe.position.x > -60.0); // Remove pipes that are off-screen
 
-        // Collision with ground or ceiling
-        if bird.position.y <= 0.0 || bird.position.y >= SCREEN_HEIGHT {
-            bird.position.y = SCREEN_HEIGHT / 2.0;
-            bird.velocity = 0.0;
-        }
-
-        // Collision with pipes
-        for pipe in &pipes {
-            if bird.position.y < pipe.gap_y - 50.0 || bird.position.y > pipe.gap_y + 50.0 {
-                if bird.position.x > pipe.position.x && bird.position.x < pipe.position.x + 60.0 {
-                    bird.position.y = SCREEN_HEIGHT / 2.0;
-                    bird.velocity = 0.0;
-                }
-            }
-        }
+        // Collision logic...
 
         clear_background(SKYBLUE);
 
-        // Draw bird
-        draw_circle(bird.position.x, bird.position.y, 20.0, YELLOW);
+        // Draw bird...
 
-        // Draw pipes
-        for pipe in &pipes {
-            draw_rectangle(pipe.position.x, 0.0, 60.0, pipe.gap_y - 50.0, DARKGREEN);
-            draw_rectangle(pipe.position.x, pipe.gap_y + 50.0, 60.0, SCREEN_HEIGHT - pipe.gap_y - 50.0, DARKGREEN);
-        }
-
+        // Draw pipes...
+        
         next_frame().await;
     }
 }

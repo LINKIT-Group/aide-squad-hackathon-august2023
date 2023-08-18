@@ -29,20 +29,6 @@ struct Bird {
     // texture: Texture2D, // This is the new field for the image texture
 }
 
-// impl Bird {
-//     fn new() -> Self {
-//         // let texture = load_texture("assets/pocket.png").unwrap(); // Load the texture
-//         let texture = futures::executor::block_on(async {
-//             load_texture("assets/rocker.png").await.unwrap()
-//         });
-//         Self {
-//             position: Vec2::new(SCREEN_WIDTH / 4.0, SCREEN_HEIGHT / 2.0),
-//             velocity: 0.0,
-//             texture, // Set the loaded texture
-//         }
-//     }
-// }
-
 struct Pipe {
     position: Vec2,
     gap_y: f32,
@@ -92,8 +78,8 @@ impl GameState {
 async fn main() {
     let mut game_state = GameState::new();
     let mut mode = GameMode::Playing;
-    let player_texture = load_texture("assets/my_image.png").await.unwrap();
-
+    let player_texture = load_texture("paper.png").await.unwrap();
+    let player_scale_factor = 0.2;
 
 
     loop {
@@ -139,8 +125,12 @@ async fn main() {
 
 
                 // Draw bird
-                draw_circle(game_state.bird.position.x, game_state.bird.position.y, 20.0, YELLOW);
-                // draw_texture(&player_texture, game_state.bird.position.x, game_state.bird.position.y, YELLOW);
+                // draw_circle(game_state.bird.position.x, game_state.bird.position.y, 20.0, YELLOW);
+                draw_texture_ex(&player_texture, game_state.bird.position.x, game_state.bird.position.y, WHITE,
+                    DrawTextureParams {
+                        dest_size: Some(vec2(player_texture.width() * player_scale_factor, player_texture.height() * player_scale_factor)),
+                        ..Default::default()  // use default values for other parameters
+                    },);
 
 
                 // Draw pipes

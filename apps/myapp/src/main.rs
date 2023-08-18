@@ -1,15 +1,32 @@
 use macroquad::prelude::*;
 
-const SCREEN_WIDTH: f32 = 1280.0;
-const SCREEN_HEIGHT: f32 = 800.0;
+const SCREEN_WIDTH: f32 = 1800.0;
+const SCREEN_HEIGHT: f32 = 900.0;
 const GRAVITY: f32 = 0.25;
 const JUMP_STRENGTH: f32 = -5.0;
 const PIPE_SPEED: f32 = -3.0;
 const PIPE_SPACING: f32 = 550.0;
+const FRAME_THICKNESS: f32 = 5.0;
+
+fn draw_game_frame() {
+    // Top line
+    draw_line(0.0, 0.0, SCREEN_WIDTH, 0.0, FRAME_THICKNESS, BLACK);
+    
+    // Bottom line
+    draw_line(0.0, SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT, FRAME_THICKNESS, BLACK);
+    
+    // Left line
+    draw_line(0.0, 0.0, 0.0, SCREEN_HEIGHT, FRAME_THICKNESS, BLACK);
+    
+    // Right line
+    draw_line(SCREEN_WIDTH, 0.0, SCREEN_WIDTH, SCREEN_HEIGHT, FRAME_THICKNESS, BLACK);
+}
+
 
 struct Bird {
     position: Vec2,
     velocity: f32,
+    // texture: Texture2D, // This is the new field for the image texture
 }
 
 struct Pipe {
@@ -41,6 +58,7 @@ struct GameState {
 
 impl GameState {
     fn new() -> Self {
+        // let bird = Bird::new();
         let bird = Bird {
             position: vec2(SCREEN_WIDTH * 0.2, SCREEN_HEIGHT / 2.0),
             velocity: 0.0,
@@ -61,6 +79,8 @@ async fn main() {
     let background_texture = load_texture("background.png").await.unwrap();
     let mut game_state = GameState::new();
     let mut mode = GameMode::Playing;
+    let player_texture = load_texture("paper.png").await.unwrap();
+    let player_scale_factor = 0.2;
 
 
     loop {
@@ -120,9 +140,16 @@ async fn main() {
                         ..Default::default()
                     },
                 );
+                draw_game_frame();
 
                 // Draw bird
-                draw_circle(game_state.bird.position.x, game_state.bird.position.y, 20.0, YELLOW);
+                // draw_circle(game_state.bird.position.x, game_state.bird.position.y, 20.0, YELLOW);
+                draw_texture_ex(&player_texture, game_state.bird.position.x, game_state.bird.position.y, WHITE,
+                    DrawTextureParams {
+                        dest_size: Some(vec2(player_texture.width() * player_scale_factor, player_texture.height() * player_scale_factor)),
+                        ..Default::default()  // use default values for other parameters
+                    },);
+
 
                 // Draw pipes
                 for pipe in &game_state.pipes {
@@ -133,6 +160,8 @@ async fn main() {
 
             GameMode::GameOver => {
                 clear_background(SKYBLUE);
+                draw_game_frame();
+
                 
                 draw_text("Game Over", SCREEN_WIDTH / 2.0 - 100.0, SCREEN_HEIGHT / 2.0 - 20.0, 40.0, WHITE);
                 draw_text("Click to restart!", SCREEN_WIDTH / 2.0 - 150.0, SCREEN_HEIGHT / 2.0 + 30.0, 30.0, WHITE);

@@ -5,7 +5,7 @@ const SCREEN_HEIGHT: f32 = 900.0;
 const GRAVITY: f32 = 0.25;
 const JUMP_STRENGTH: f32 = -5.0;
 const PIPE_SPEED: f32 = -3.0;
-const PIPE_SPACING: f32 = 300.0;
+const PIPE_SPACING: f32 = 550.0;
 const FRAME_THICKNESS: f32 = 5.0;
 
 fn draw_game_frame() {
@@ -94,14 +94,23 @@ async fn main() {
                 }
 
                 // Pipe logic
+                if game_state.pipes.is_empty() || game_state.pipes.last().unwrap().position.x < SCREEN_WIDTH - PIPE_SPACING {
+                    let num_new_pipes = ((SCREEN_WIDTH - game_state.pipes.last().unwrap().position.x) / PIPE_SPACING) as usize;
+                    for _ in 0..num_new_pipes {
+                        let new_pipe_x = if game_state.pipes.is_empty() {
+                            SCREEN_WIDTH
+                        } else {
+                            game_state.pipes.last().unwrap().position.x + PIPE_SPACING
+                        };
+                        game_state.pipes.push(Pipe::new(new_pipe_x));
+                    }
+                }
+
                 for pipe in &mut game_state.pipes {
                     pipe.position.x += PIPE_SPEED;
                 }
 
-                if game_state.pipes[0].position.x + 60.0 < 0.0 {
-                    game_state.pipes.remove(0);
-                    game_state.pipes.push(Pipe::new(SCREEN_WIDTH));
-                }
+                game_state.pipes.retain(|pipe| pipe.position.x > -60.0);
 
                 // Collision with ground or ceiling
                 if game_state.bird.position.y <= 0.0 || game_state.bird.position.y >= SCREEN_HEIGHT {
@@ -135,8 +144,8 @@ async fn main() {
 
                 // Draw pipes
                 for pipe in &game_state.pipes {
-                    draw_rectangle(pipe.position.x, 0.0, 60.0, pipe.gap_y - 50.0, DARKGREEN);
-                    draw_rectangle(pipe.position.x, pipe.gap_y + 50.0, 60.0, SCREEN_HEIGHT - pipe.gap_y - 50.0, DARKGREEN);
+                    draw_rectangle(pipe.position.x, 0.0, 60.0, pipe.gap_y - 90.0, DARKGREEN);
+                    draw_rectangle(pipe.position.x, pipe.gap_y + 90.0, 60.0, SCREEN_HEIGHT - pipe.gap_y - 90.0, DARKGREEN);
                 }
             }
 

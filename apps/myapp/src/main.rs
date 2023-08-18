@@ -24,7 +24,7 @@ struct Pipe {
 
 fn create_random_pipe(screen_width: f32) -> Pipe {
     let width = rand::gen_range(30.0, 100.0);   // Random width between 30 and 100 units
-    let height = rand::gen_range(50.0, 300.0);  // Random height between 50 and 300 units
+    let height = rand::gen_range(100.0, 300.0);  // Random height between 50 and 300 units
     let y_position = rand::gen_range(0.0, SCREEN_HEIGHT - height); // Ensuring the rectangle fits on the screen
 
     Pipe {
@@ -133,7 +133,7 @@ struct GameState {
     pipes: Vec<Pipe>,
     coins: Vec<Coin>,
     score: i32,   // tracks the score, incremented when a coin is collected
-
+    speed_multiplier: f32,
 }
 
 impl GameState {
@@ -154,6 +154,7 @@ impl GameState {
             pipes: pipes,
             coins: coins,
             score: 0,
+            speed_multiplier: 1.0
             // game_over: false,
             // show_new_game_screen: true,
         }
@@ -173,7 +174,6 @@ async fn main() {
     let mut mode = GameMode::Playing;
     let player_texture = load_texture("paper.png").await.unwrap();
     let player_scale_factor = 0.2;
-
 
     loop {
         match mode {
@@ -250,6 +250,7 @@ async fn main() {
                     let collided = is_circle_colliding_with_bird(&game_state.bird, coin.position, coin.radius);
                     if collided {
                         game_state.score += 1;  // Assuming you have a score field in GameState
+                        game_state.speed_multiplier = 1.0 + 0.1 * game_state.score as f32;
                     }
                     !collided && coin.position.x + coin.radius > 0.0
                 });

@@ -5,7 +5,7 @@ const SCREEN_HEIGHT: f32 = 800.0;
 const GRAVITY: f32 = 0.25;
 const JUMP_STRENGTH: f32 = -5.0;
 const PIPE_SPEED: f32 = -3.0;
-const PIPE_SPACING: f32 = 600.0;
+const PIPE_SPACING: f32 = 550.0;
 
 struct Bird {
     position: Vec2,
@@ -116,8 +116,8 @@ async fn main() {
 
                 // Draw pipes
                 for pipe in &game_state.pipes {
-                    draw_rectangle(pipe.position.x, 0.0, 60.0, pipe.gap_y - 50.0, DARKGREEN);
-                    draw_rectangle(pipe.position.x, pipe.gap_y + 50.0, 60.0, SCREEN_HEIGHT - pipe.gap_y - 50.0, DARKGREEN);
+                    draw_rectangle(pipe.position.x, 0.0, 60.0, pipe.gap_y - 90.0, DARKGREEN);
+                    draw_rectangle(pipe.position.x, pipe.gap_y + 90.0, 60.0, SCREEN_HEIGHT - pipe.gap_y - 90.0, DARKGREEN);
                 }
             }
 

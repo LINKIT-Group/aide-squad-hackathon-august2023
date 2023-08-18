@@ -298,12 +298,13 @@ async fn main() {
             }
 
             GameMode::GameOver => {
-                clear_background(SKYBLUE);
+                clear_background(Color::new(63.0 / 255.0, 145.0 / 255.0, 195.0 / 255.0, 1.0));
                 draw_game_frame();
 
                 
-                draw_text("Game Over", SCREEN_WIDTH / 2.0 - 100.0, SCREEN_HEIGHT / 2.0 - 20.0, 40.0, WHITE);
-                draw_text("Click to restart!", SCREEN_WIDTH / 2.0 - 150.0, SCREEN_HEIGHT / 2.0 + 30.0, 30.0, WHITE);
+                draw_text("Game Over", SCREEN_WIDTH / 2.0 - 100.0, SCREEN_HEIGHT / 2.0 - 20.0, 40.0, Color::new(42.0 / 255.0, 37.0 / 255.0, 56.0 / 255.0, 1.0));
+                draw_text("Click to restart!", SCREEN_WIDTH / 2.0 - 150.0, SCREEN_HEIGHT / 2.0 + 30.0, 30.0, Color::new(42.0 / 255.0, 37.0 / 255.0, 56.0 / 255.0, 1.0));
+            
 
                 if is_mouse_button_pressed(MouseButton::Left) {
                     game_state = GameState::new();

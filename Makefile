@@ -36,6 +36,7 @@ build:
 
 run: build
 	@[ -d $(APP_DIR) ] || (echo "ERROR: $(APP_DIR) not found" && exit 1)
+	@[ -d ./html ] || mkdir -p ./html
 	docker run -it --rm \
 		--name $(IMAGE_NAME) \
 		-e APP_NAME=$(APP_NAME) \
@@ -43,5 +44,6 @@ run: build
 		-e GID=$(HOST_GID) \
 		-e USER=$(HOST_USER) \
 		-p 8080:8080 \
+		-v ./html:/html \
 		-v $(APP_DIR):/app $(IMAGE_NAME)
 

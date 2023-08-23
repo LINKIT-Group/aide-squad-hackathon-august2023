@@ -14,7 +14,7 @@ if [ "$1" = "serve" ];then
 elif [ "$1" = "update" ];then
     HASH=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1)
     rm "${HTML_DIRECTORY}"/*.wasm 2>/dev/null
-    cp "${APP_DIRECTORY}"/target/wasm32-unknown-unknown/debug/"${APP_NAME}".wasm \
+    cp "${APP_DIRECTORY}"/target/wasm32-unknown-unknown/release/"${APP_NAME}".wasm \
         "${HTML_DIRECTORY}"/${HASH}.wasm || exit 1
     sed "\
         s:{{ *WASM_FILE *}}:${HASH}.wasm:g;\
@@ -28,7 +28,7 @@ else
     sh $0 serve &
     # on change: compile and update html directory with new wasm file
     cargo watch -x "\
-        build --target wasm32-unknown-unknown && sh $0 update"
+        build --release --target wasm32-unknown-unknown && sh $0 update"
 fi
 
 exit 0

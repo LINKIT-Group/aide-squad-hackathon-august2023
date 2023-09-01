@@ -44,6 +44,6 @@ run: build
 		-e GID=$(HOST_GID) \
 		-e USER=$(HOST_USER) \
 		-p 8080:8080 \
-		-v ./html:/html \
+		-v $(PWD)/html:/html \
 		-v $(APP_DIR):/app $(IMAGE_NAME)
 
